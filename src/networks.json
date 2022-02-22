@@ -11,7 +11,7 @@
     "ws": [
       "wss://ws.tomochain.com"
     ],
-    "explorer": "https://scan.tomochain.com"
+    "explorer": "https://tomoscan.io"
   },
   "89": {
     "key": "89",
@@ -25,7 +25,7 @@
     "ws": [
       "wss://ws.testnet.tomochain.com"
     ],
-    "explorer": "https://scan.testnet.tomochain.com"
+    "explorer": "https://testnet.tomoscan.io"
   },
   "1": {
     "key": "1",
