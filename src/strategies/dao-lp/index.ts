@@ -11,6 +11,7 @@ import LUAFarmABI from "./lua-farm-abi.json";
 import { Interface } from '@ethersproject/abi';
 import _strategies from '../../strategies';
 import networks from '../../networks.json';
+import BigNumber from 'bignumber.js'
 const Web3 = require('web3')
 var BN = Web3.utils.BN;
 
@@ -139,22 +140,28 @@ export async function strategy(
 
     // sum up
     let stakedTDAO = stakedLPBalances.returnData.map((stakedBalance, index) => {
-        return new BN(lpBalances.returnData[index].substring(2, 66), 16).add(
-            new BN(stakedBalance.substring(2, 66), 16)
-        ).mul(
-            new BN(pairsInfo.pairs[0].reserve0)
-        ).mul(
-            new BN(2)
-        )
-        .div(
-            new BN(pairsInfo.pairs[0].totalSupply)
-        );
+            return new BigNumber(lpBalances.returnData[index].substring(2, 66), 16)
+            .plus(new BigNumber(stakedBalance.substring(2, 66), 16))
+            .multipliedBy(new BigNumber(pairsInfo.pairs[0].reserve0))
+            .multipliedBy(new BigNumber(2))
+            .div(new BigNumber(pairsInfo.pairs[0].totalSupply))
+        // return new BN(lpBalances.returnData[index].substring(2, 66), 16).add(
+        //     new BN(stakedBalance.substring(2, 66), 16)
+        // ).mul(
+        //     new BN(pairsInfo.pairs[0].reserve0)
+        // ).mul(
+        //     new BN(2)
+        // )
+        // .div(
+        //     new BN(pairsInfo.pairs[0].totalSupply)
+        // );
     });
 
     return Object.fromEntries(
         stakedTDAO.map((value, i) => [
-          addresses[i],
-          parseFloat(formatUnits(value.toString(), options.decimals))
+            addresses[i],
+            //   parseFloat(formatUnits(value.toString(), options.decimals))
+            new BigNumber(value).div(10 ** 18).toString(10)
         ])
     );
 }
