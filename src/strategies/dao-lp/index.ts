@@ -161,7 +161,7 @@ export async function strategy(
         stakedTDAO.map((value, i) => [
             addresses[i],
             //   parseFloat(formatUnits(value.toString(), options.decimals))
-            parseFloat(new BigNumber(value).div(options.decimals).toString(10))
+            parseFloat(new BigNumber(value).div(10 ** parseInt(options.decimals)).toString(10))
         ])
     );
 }
