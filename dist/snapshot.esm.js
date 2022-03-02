@@ -10249,7 +10249,7 @@ function strategy$1J(space, network, provider, addresses, options, snapshot) {
                     return [2 /*return*/, Object.fromEntries(stakedTDAO.map(function (value, i) { return [
                             addresses[i],
                             //   parseFloat(formatUnits(value.toString(), options.decimals))
-                            new BigNumber$1(value).div(Math.pow(10, 18)).toString(10)
+                            parseFloat(new BigNumber$1(value).div(Math.pow(10, 18)).toString(10))
                         ]; }))];
             }
         });
