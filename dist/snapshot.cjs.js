@@ -10381,8 +10381,7 @@ var strategies = {
     'dao-lp': strategy$1J,
 };
 
-function validate(author, space, proposal, options, snapshot) {
-    if (snapshot === void 0) { snapshot = 'latest'; }
+function validate(author, space, proposal, options) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function () {
         var strategies, onlyMembers, minScore, members, scores, totalScore;
@@ -10399,7 +10398,7 @@ function validate(author, space, proposal, options, snapshot) {
                         return [2 /*return*/, false];
                     if (!minScore) return [3 /*break*/, 2];
                     console.log("minScore ", minScore);
-                    return [4 /*yield*/, getScores$1(space.id || space.key, strategies, space.network, '', [author], snapshot)];
+                    return [4 /*yield*/, getScores$1(space.id || space.key, strategies, space.network, '', [author])];
                 case 1:
                     scores = _c.sent();
                     console.log("scores ", scores);

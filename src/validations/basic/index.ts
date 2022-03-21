@@ -4,8 +4,7 @@ export default async function validate(
   author: string,
   space,
   proposal,
-  options,
-  snapshot: number | string = 'latest'
+  options
 ): Promise<boolean> {
   const strategies = options.strategies || space.strategies;
   const onlyMembers = options.onlyMembers || space.filters?.onlyMembers;
@@ -23,8 +22,7 @@ export default async function validate(
       strategies,
       space.network,
       '',
-      [author],
-      snapshot
+      [author]
     );
     console.log("scores ", scores)
     const totalScore: any = scores
