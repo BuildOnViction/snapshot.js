@@ -846,6 +846,7 @@ var networks = {
 	network: "homestead",
 	multicall: "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
 	rpc: [
+		"https://rpc.ankr.com/eth",
 		{
 			url: "https://api-geth-archive.ankr.com",
 			user: "balancer_user",
