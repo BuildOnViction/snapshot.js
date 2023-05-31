@@ -8,6 +8,7 @@ import { abi as multicallAbi } from '../../abi/Multicall.json';
 export const author = 'anhnt';
 export const version = '0.1.0';
 import LUAFarmABI from "./lua-farm-abi.json";
+import IUniswapV2Pair from './IUniswapV2Pair.json'
 import { Interface } from '@ethersproject/abi';
 import _strategies from '../../strategies';
 import networks from '../../networks.json';
@@ -95,22 +96,34 @@ export async function strategy(
     const blockTag = typeof snapshot === 'number' ? snapshot : 'latest';
 
     const lpTokenAddress = options.lpTokenAddress.toLowerCase();
+    const web3 = new Web3(new Web3.providers.HttpProvider(networks[network].rpc[0]))
+    const pairContract = new web3.eth.Contract(IUniswapV2Pair.abi, lpTokenAddress);
 
     // const tokenAddress = options.tokenAddress.toLowerCase();
 
     // const result = await subgraphRequest(UNISWAP_SUBGRAPH_URL[network], params);
     // get reserve balance
-    const pairsInfo = await subgraphLuaswapRequest(
-        "https://api.luaswap.org/subgraphs/name/phucngh/Luaswap3",
-        {
-            "operationName": "pairByAddress",
-            "variables": {
-                "pairAddress": "0x88ba0bd9e1f90ccc21bdf7d33cb67fa5743da036",
-                "block": blockTag
-            },
-            "query": "query pair($pairAddress: Bytes!, $block: Int!) {\n  pairs(where: {id: $pairAddress}, block: {number: $block}) {\n  id\n  reserve0\n  reserve1\n  reserveUSD\n  totalSupply\n  }\n}\n"
-        }
-    ); 
+    // const pairsInfo = await subgraphLuaswapRequest(
+    //     "https://api.luaswap.org/subgraphs/name/phucngh/Luaswap3",
+    //     {
+    //         "operationName": "pairByAddress",
+    //         "variables": {
+    //             "pairAddress": "0x88ba0bd9e1f90ccc21bdf7d33cb67fa5743da036",
+    //             "block": blockTag
+    //         },
+    //         "query": "query pair($pairAddress: Bytes!, $block: Int!) {\n  pairs(where: {id: $pairAddress}, block: {number: $block}) {\n  id\n  reserve0\n  reserve1\n  reserveUSD\n  totalSupply\n  }\n}\n"
+    //     }
+    // ); 
+    let pairsInfo = { }
+    let pairs = await pairContract.methods.getReserves().call(
+        {},
+        blockTag
+    )
+    let pairTotalSupply = await pairContract.methods.totalSupply().call(
+        {},
+        blockTag
+    )
+    pairsInfo['pairs'] = [Object.assign(JSON.parse(JSON.stringify(pairs)), {totalSupply: pairTotalSupply})]
     console.log(pairsInfo);
     // get staked balance then convert to to LP balance
     let stakedLPBalances = await multicallLuaFarm(
@@ -122,6 +135,8 @@ export async function strategy(
             [0, address]
         ])
     );
+
+
     console.log(stakedLPBalances);
 
     // get LP balance
@@ -142,9 +157,9 @@ export async function strategy(
     let stakedTDAO = stakedLPBalances.returnData.map((stakedBalance, index) => {
             return new BigNumber(lpBalances.returnData[index].substring(2, 66), 16)
             .plus(new BigNumber(stakedBalance.substring(2, 66), 16))
-            .multipliedBy(new BigNumber(pairsInfo.pairs[0].reserve0))
+            .multipliedBy(new BigNumber(pairsInfo['pairs'][0].reserve0))
             .multipliedBy(new BigNumber(2))
-            .div(new BigNumber(pairsInfo.pairs[0].totalSupply))
+            .div(new BigNumber(pairsInfo['pairs'][0].totalSupply))
         // return new BN(lpBalances.returnData[index].substring(2, 66), 16).add(
         //     new BN(stakedBalance.substring(2, 66), 16)
         // ).mul(
